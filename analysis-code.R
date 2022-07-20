@@ -12,5 +12,5 @@ library(useful)
 library(glmnet)
 library(parallel)
 library(doParallel)
-kjkfd
+#import the data for analysis
 
