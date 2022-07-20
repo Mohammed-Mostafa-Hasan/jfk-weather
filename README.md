@@ -1,1 +1,1 @@
-# jfk-weather
+# jfk-weather prediction 
