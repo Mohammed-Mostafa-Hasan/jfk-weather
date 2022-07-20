@@ -1,6 +1,7 @@
 #import libray we need for this project 
 library(tidymodels)
 library(tidyverse)
+library(gridExtra)
 library(rlang)
 library(tidyr)
 library(magrittr)
@@ -41,7 +42,16 @@ sub_col %<>%mutate(HOURLYPrecip=str_remove(HOURLYPrecip,pattern = "s$"),
 #cheking data type for each column
 glimpse(sub_col)
 # convert HOURLYPrecip into numeric column
-sub_col$HOURLYPrecip <- as.numeric(as.factor(sub_col$HOURLYPrecip))
+sub_col$HOURLYPrecip <- as.numeric(sub_col$HOURLYPrecip)
 glimpse(sub_col)
 # renamming data columns
 names(sub_col)<- c('relative_humidity','dry_bulb_temp_f','precip','wind_speed','station_pressure')
+#make some visualization to identify distributin of the data 
+p1 <-ggplot(data =sub_col)+geom_histogram(aes(x=relative_humidity),bins = 30)
+p2 <-ggplot(data =sub_col)+geom_histogram(aes(x=dry_bulb_temp_f),bins = 30)
+p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=precip),bins = 30) 
+p4 <-ggplot(data =sub_col)+geom_histogram(aes(x=wind_speed),bins = 30) 
+p5 <-ggplot(data =sub_col)+geom_histogram(aes(x=station_pressure),bins = 30)  
+grid.arrange(p1,p2,p3,p4,p5,ncol=1)
+summary(sub_col$precip) 
+count(sub_col$precip=="0.0")
