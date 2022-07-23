@@ -2,7 +2,10 @@
 library(ggplot2)
 library(tidyverse)
 library(gridExtra)
+<<<<<<< HEAD
 library(tidymodels)
+=======
+>>>>>>> da9f73af4f2606b5a9afbb75561f864a2f4b7de0
 library(rlang)
 library(tidyr)
 library(magrittr)
@@ -49,12 +52,17 @@ names(sub_col)<- c('relative_humidity','dry_bulb_temp_f','precip','wind_speed','
 #make some visualization to identify distributin of the data 
 p1 <-ggplot(data =sub_col)+geom_histogram(aes(x=relative_humidity),bins = 30)
 p2 <-ggplot(data =sub_col)+geom_histogram(aes(x=dry_bulb_temp_f),bins = 30)
+<<<<<<< HEAD
 p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=(precip)**.2),bins = 30)
 p3+scale_x_continuous(breaks=seq(0,3,by=0.2))
+=======
+p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=precip),bins = 30) 
+>>>>>>> da9f73af4f2606b5a9afbb75561f864a2f4b7de0
 p4 <-ggplot(data =sub_col)+geom_histogram(aes(x=wind_speed),bins = 30) 
 p5 <-ggplot(data =sub_col)+geom_histogram(aes(x=station_pressure),bins = 30)  
 grid.arrange(p1,p2,p3,p4,p5,ncol=1)
 summary(sub_col$precip) 
+<<<<<<< HEAD
 #create logical response for our model 
 #sub_col$precip <- with(sub_col,precip>0)
 #dividing data into training and test set with the same random variable
@@ -126,3 +134,7 @@ geom_segment(aes(xend=relative_humidity,yend = predicted))
 
 
 #from the previous plot we note the relation between precipe and relative_humidity in linear
+=======
+count(sub_col$precip=="0.0")
+unique(sub_col$precip)
+>>>>>>> da9f73af4f2606b5a9afbb75561f864a2f4b7de0
