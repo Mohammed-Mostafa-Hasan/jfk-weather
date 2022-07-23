@@ -1,11 +1,11 @@
 #import libray we need for this project 
-library(tidymodels)
+library(ggplot2)
 library(tidyverse)
 library(gridExtra)
+library(tidymodels)
 library(rlang)
 library(tidyr)
 library(magrittr)
-library(ggplot2)
 library(coefplot)
 library(boot)
 library(rsample)
@@ -49,9 +49,80 @@ names(sub_col)<- c('relative_humidity','dry_bulb_temp_f','precip','wind_speed','
 #make some visualization to identify distributin of the data 
 p1 <-ggplot(data =sub_col)+geom_histogram(aes(x=relative_humidity),bins = 30)
 p2 <-ggplot(data =sub_col)+geom_histogram(aes(x=dry_bulb_temp_f),bins = 30)
-p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=precip),bins = 30) 
+p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=(precip)**.2),bins = 30)
+p3+scale_x_continuous(breaks=seq(0,3,by=0.2))
 p4 <-ggplot(data =sub_col)+geom_histogram(aes(x=wind_speed),bins = 30) 
 p5 <-ggplot(data =sub_col)+geom_histogram(aes(x=station_pressure),bins = 30)  
 grid.arrange(p1,p2,p3,p4,p5,ncol=1)
 summary(sub_col$precip) 
-count(sub_col$precip=="0.0")
+#create logical response for our model 
+#sub_col$precip <- with(sub_col,precip>0)
+#dividing data into training and test set with the same random variable
+set.seed(1234)
+case_data <- initial_split(data = sub_col, prop = 0.8)
+traind_data <- training(case_data)
+test_data   <- testing(case_data)
+glimpse(sub_col)
+#build diffferent models with different interation between feature and choose the best of them
+
+#glm_1 <-glm(precip~I(dry_bulb_temp_f+relative_humidity*wind_speed*station_pressure)^2,
+          #  traind_data,family=binomial(link="logit"))
+#glm_2 <-glm(precip~dry_bulb_temp_f*relative_humidity*wind_speed*station_pressure
+          # ,traind_data,family=binomial(link="logit"))
+#create new lm model
+new_model <- lm(precip~dry_bulb_temp_f+relative_humidity+wind_speed+station_pressure,data = traind_data)
+pred <- predict(new_model,newdata =  test_data,interval = "confidence")
+head(test_data)
+summary(new_model)
+summary(pred)
+model_1<-lm(precip~wind_speed+station_pressure+dry_bulb_temp_f+relative_humidity,data = sub_col)
+#asset the model visually by cheking assumption about linear model
+#first useing fitted value against residuals {by using fortifies to gain .fitted&.resid variables}
+#to check linearity and homoscedasticity 
+plot(model_1,which = 1)
+#to check normality of the model usign q-q plot
+plot(model_1,which = 2)
+#to check homoscedasticity
+plot(model_1,which = 3)
+# check outlier influential in linear regression analysis
+plot(model_1,which = 5)
+
+
+#ggplot(traind_data,aes(x=relative_humidity, y=precip))+geom_point()+geom_smooth(method = "lm",col="red",formula = y~x)
+
+#to asset the model numerically {find how close the data is to fitted regression line}
+#find out percentage of variation of the target variable 
+summary(model_1)
+traind_data$predicted<-predict(model_1,traind_data)
+head(traind_data)
+#steps for comparing actual value and predicted value visually
+# 1-using ggplot with data and two variable of comparson 
+# 2- plot acual values useing this command geom_point()
+# 3-plot regression line using geom_smooth(method = "lm",se=FALSE,color,formula)
+# 4-plot predicted value with also geom_point() but now with aes(y= prediced values)
+# 5-finally connect all predicted value and actual value using geom_segment(aes(xend,yend))
+ggplot(traind_data, aes(x=relative_humidity,y=precip))+
+#plot the actual points  
+geom_point()+
+#plot regression line
+geom_smooth(method = "lm",se=FALSE,color="red",formula = y~x) +
+#add the predicted values
+geom_point(aes(y=predicted),color = "green")+  
+#connect the actual data point to their corresponding predicted value
+geom_segment(aes(xend=relative_humidity,yend = predicted))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#from the previous plot we note the relation between precipe and relative_humidity in linear
