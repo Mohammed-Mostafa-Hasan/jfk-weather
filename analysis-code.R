@@ -13,6 +13,7 @@ library(useful)
 library(glmnet)
 library(parallel)
 library(doParallel)
+library(reshape2)
 #import the data for analysis
 jfk_data <-read.table("noaa-weather-sample-data/jfk_weather_sample.csv",header = TRUE,sep = ",")
 class(jfk_data)
@@ -49,7 +50,6 @@ names(sub_col)<- c('relative_humidity','dry_bulb_temp_f','precip','wind_speed','
 #make some visualization to identify distributin of the data 
 p1 <-ggplot(data =sub_col)+geom_histogram(aes(x=relative_humidity),bins = 30)
 p2 <-ggplot(data =sub_col)+geom_histogram(aes(x=dry_bulb_temp_f),bins = 30)
-<<<<<<< HEAD
 p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=(precip)**.2),bins = 30)
 p3+scale_x_continuous(breaks=seq(0,3,by=0.2))
 p3 <-ggplot(data =sub_col)+geom_histogram(aes(x=precip),bins = 30) 
@@ -68,7 +68,7 @@ glimpse(sub_col)
 #build diffferent models with different interation between feature and choose the best of them
 
 #glm_1 <-glm(precip~I(dry_bulb_temp_f+relative_humidity*wind_speed*station_pressure)^2,
-          #  traind_data,family=binomial(link="logit"))
+        #  traind_data,family=binomial(link="logit"))
 #glm_2 <-glm(precip~dry_bulb_temp_f*relative_humidity*wind_speed*station_pressure
           # ,traind_data,family=binomial(link="logit"))
 #create new lm model
@@ -112,4 +112,9 @@ geom_smooth(method = "lm",se=FALSE,color="red",formula = y~x) +
 geom_point(aes(y=predicted),color = "green")+  
 #connect the actual data point to their corresponding predicted value
 geom_segment(aes(xend=relative_humidity,yend = predicted))
-
+ colnames(sub_col)
+# gather data into one column include all columns name and another columns for gather all values inside these columns 
+gathring_data <- sub_col %>%  gather(key = Type,value = Measurement,relative_humidity,dry_bulb_temp_f,wind_speed,station_pressure)
+colnames(gathring_data)
+head(gathring_data)
+workf
